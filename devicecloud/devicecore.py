@@ -179,8 +179,8 @@ class DeviceCoreAPI(APIBase):
         """Provision a single device with the specified information
 
         This API call provisions a new device on this cloud account.  In order for this
-        to work, a `mac_address`, `device_id`, or `imei` must be provided.  All
-        other parameters are optional and can be specified in addition to the primary
+        to work, a `mac_address`, `device_id`, or `imei` must be provided.  
+        All other parameters are optional and can be specified in addition to the primary
         identifier for the device.
 
         This request will always return a dictionary unless the request fails altogether.  The
@@ -200,6 +200,8 @@ class DeviceCoreAPI(APIBase):
             This is one of the options for the required primary id.
         :param str imei: The IMEI of the device to be added (if no MAC/ID available).  This is one
             of the options for the required primary id.
+        :param str install_code: (Optional, but required for some devices) The Install Code 
+            given on the device.
         :param str group_path: (optional) Path of group that this device should be added to.
         :param str metadata: (optional) Arbitrary metadata to associate with this device.
         :param float map_lat: (optional) Latitude of this device in degrees
@@ -222,6 +224,7 @@ class DeviceCoreAPI(APIBase):
         #   <!-- <devCellularModemId>112222223333334</devCellularModemId> -->
         #   <!-- <devConnectwareId>00000000-00000000-000000FF-FF000000</devConnectwareId> -->
         #   <!-- Optional elements that can be included to describe the device. -->
+        #   <!-- <devInstallCode>ABC123456VAS</devInstallCode> -->
         #   <!-- <grpPath>test</grpPath> -->
         #   <!-- <dpUserMetaData>In the test lab.</dpUserMetaData> -->
         #   <!-- <dpTags>needs-upgrade</dpTags> -->
@@ -280,6 +283,7 @@ class DeviceCoreAPI(APIBase):
                 raise ValueError("mac_address, device_id, or imei must be provided for device %r" % d)
 
             # Write optional elements if present.
+            maybe_write_element("devInstallCode", d.get("devInstallCode"))
             maybe_write_element("grpPath", d.get("group_path"))
             maybe_write_element("dpUserMetaData", d.get("metadata"))
             maybe_write_element("dpTags", d.get("tags"))
@@ -287,6 +291,7 @@ class DeviceCoreAPI(APIBase):
             maybe_write_element("dpMapLat", d.get("map_lat"))
             maybe_write_element("dpContact", d.get("contact"))
             maybe_write_element("dpDescription", d.get("description"))
+            
 
             sio.write("</DeviceCore>")
         sio.write("</list>")
